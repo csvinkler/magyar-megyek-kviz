@@ -19,6 +19,7 @@
   const learnViewButton = document.getElementById("learn-view-mode");
   const countyList = document.getElementById("county-list");
   const completionReview = document.getElementById("completion-review");
+  const pageShell = document.querySelector(".page-shell");
   let mainView = "quiz";
   let mode = "type";
   let revealingAnswer = false;
@@ -66,6 +67,7 @@
       marker.setAttribute("cx", county.seatX);
       marker.setAttribute("cy", county.seatY);
       marker.setAttribute("r", "4");
+      marker.dataset.countyId = county.id;
       countySeats.append(marker);
 
       const seatLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -220,6 +222,7 @@
   }
 
   function renderGame() {
+    pageShell.classList.toggle("is-playing", mainView === "quiz");
     quizPanel.hidden = mainView !== "quiz";
     learningPanel.hidden = mainView !== "learn";
     document.getElementById("county-map").classList.toggle("is-learning", mainView === "learn");
@@ -253,6 +256,12 @@
       label.classList.toggle(
         "is-answer-revealed",
         mainView === "quiz" && label.dataset.countyId === revealedSeatId
+      );
+    }
+    for (const marker of countySeats.querySelectorAll(".seat-marker")) {
+      marker.classList.toggle(
+        "is-answer-revealed",
+        mainView === "quiz" && marker.dataset.countyId === revealedSeatId
       );
     }
     updateCountyLabels();
@@ -297,7 +306,9 @@
       answerInput.placeholder = mode === "seat" ? "A székhely neve…" : "A megye neve…";
       document.querySelector('label[for="answer-input"]').textContent =
         mode === "seat" ? "A székhely neve" : "A megye neve";
-      answerInput.focus({ preventScroll: true });
+      if (!window.matchMedia("(max-width: 600px)").matches) {
+        answerInput.focus({ preventScroll: true });
+      }
       return;
     }
     answerInput.disabled = true;
@@ -407,7 +418,7 @@
 
     const answeredId = game.activeId;
     const result = submitAnswer(game, answerInput.value);
-    showAnswerResult(result, answeredId);
+    showAnswerResult(result, answeredId, mode === "seat" && result.correct);
   });
 
   function handleMapSelection(event) {
