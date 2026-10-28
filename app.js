@@ -418,7 +418,7 @@
 
     const answeredId = game.activeId;
     const result = submitAnswer(game, answerInput.value);
-    showAnswerResult(result, answeredId, mode === "seat" && result.correct);
+    showAnswerResult(result, answeredId, mode === "seat");
   });
 
   function handleMapSelection(event) {
