@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f4ee">
+    <title>Megyéről megyére — Magyarország vaktérképes kvíz</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="county-boundaries.js"></script>
+    <script defer src="counties.js"></script>
+    <script defer src="quiz.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Megyéről megyére – főoldal">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span>MEGYÉRŐL MEGYÉRE</span>
+        </a>
+        <span class="mode-label"><span class="mode-dot"></span> EGYJÁTÉKOS MÓD</span>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Tanulj, ismételj, hódítsd meg a térképet</p>
+        <h1 id="page-title">Ismered Magyarország megyéit?</h1>
+        <p class="intro-copy">Gyakorolj a megye- és székhelykvízben, vagy válts tanuló módra, ahol mind a 19 vármegye neve és székhelye megtalálható.</p>
+      </section>
+
+      <section class="game-layout" aria-label="Megye kvíz">
+        <section class="map-card" aria-label="Magyarország vaktérképe">
+          <div class="card-heading">
+            <div>
+              <p class="card-kicker">A TE TÉRKÉPED</p>
+              <h2>Magyarország</h2>
+            </div>
+            <span class="map-count" id="map-count">0 / 19</span>
+          </div>
+          <div class="map-wrap">
+            <svg id="county-map" viewBox="0 0 760 460" role="img" aria-labelledby="map-title map-description">
+              <title id="map-title">Magyarország megyéi</title>
+              <desc id="map-description">Magyarország 19 vármegyéjének határai. Tanuló módban minden vármegye neve, kvízben a megtanult nevek láthatók.</desc>
+              <defs>
+                <filter id="target-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#a44d35" flood-opacity=".28"/>
+                </filter>
+              </defs>
+              <g id="county-regions"></g>
+              <g id="county-seats" aria-hidden="true"></g>
+            </svg>
+          </div>
+          <div class="map-legend" aria-label="Térkép jelmagyarázat">
+            <span><i class="legend-swatch legend-pending"></i> Még tanulod</span>
+            <span><i class="legend-swatch legend-mastered"></i> Már tudod</span>
+            <span><i class="legend-swatch legend-current"></i> Kérdés</span>
+            <span id="seat-legend" hidden><i class="legend-swatch legend-seat"></i> Megyeszékhely</span>
+            <span id="review-legend" hidden><i class="legend-swatch legend-review"></i> Hibás válasz a menetben</span>
+          </div>
+        </section>
+
+        <aside class="quiz-card" aria-label="Kvíz és tanuló mód">
+          <div class="main-view-switch" role="group" aria-label="Játékmód">
+            <button class="main-view-option is-selected" id="quiz-view-mode" type="button" aria-pressed="true">Kvíz</button>
+            <button class="main-view-option" id="learn-view-mode" type="button" aria-pressed="false">Tanuló mód</button>
+          </div>
+          <div id="quiz-panel">
+          <div class="quiz-topline">
+            <span class="question-number">KÉRDÉS <span id="question-number">01</span></span>
+            <span class="streak" id="streak" aria-label="Pontszám">
+              <span aria-hidden="true">✦</span> <span id="score">0</span> pont
+            </span>
+          </div>
+          <div class="session-stats" aria-label="Játékmenet statisztikái">
+            <span>MENET <strong id="session-number">1</strong></span>
+            <span id="round-label">ALAPKÖR</span>
+            <span>Hiba összesen <strong id="wrong-count">0</strong></span>
+            <span><span id="county-wrong-label">Ennél a megyénél</span> <strong id="county-wrong-count">0</strong></span>
+          </div>
+          <div class="mode-switch" role="group" aria-label="Választható kvíz">
+            <button class="mode-option is-selected" id="type-mode" type="button" aria-pressed="true" data-mode="type">Megye → név</button>
+            <button class="mode-option" id="map-mode" type="button" aria-pressed="false" data-mode="map">Név → térkép</button>
+            <button class="mode-option" id="seat-mode" type="button" aria-pressed="false" data-mode="seat">Megye → székhely</button>
+            <button class="mode-option" id="seat-map-mode" type="button" aria-pressed="false" data-mode="seat-map">Székhely → térkép</button>
+          </div>
+          <div class="question-body" aria-live="polite">
+            <div class="question-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M24 5.5 39.5 14v20L24 42.5 8.5 34V14L24 5.5Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="m8.8 14.2 15.1 8.6 15.3-8.6M23.9 22.8v19" stroke="currentColor" stroke-width="1.7"/>
+                <circle cx="24" cy="23" r="3.1" fill="currentColor"/>
+              </svg>
+            </div>
+            <p class="card-kicker">NÉZZ A TÉRKÉPRE</p>
+            <h2 id="question-title">Melyik megye?</h2>
+            <p class="question-hint">Írd be a körvonallal jelölt megye nevét.</p>
+            <form id="answer-form" autocomplete="off">
+              <label class="sr-only" for="answer-input">A megye neve</label>
+              <input id="answer-input" name="answer" type="text" placeholder="A megye neve…" enterkeyhint="done" spellcheck="false" autocapitalize="words" required>
+              <button class="submit-button" type="submit">
+                <span>Válasz ellenőrzése</span>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </form>
+            <p class="feedback" id="feedback" role="status"></p>
+            <section id="completion-review" class="completion-review" aria-live="polite" hidden></section>
+            <button class="new-game-button" id="new-game-button" type="button" hidden>Új játékmenet</button>
+          </div>
+          <div class="quiz-footer">
+            <span class="progress-label"><span id="learned-count">0</span> / 19 <span id="progress-label-text">megye megtanulva</span></span>
+            <div class="progress-track" role="progressbar" aria-label="Megtanult megyék" aria-valuemin="0" aria-valuemax="19" aria-valuenow="0" id="progress-bar">
+              <span id="progress-fill"></span>
+            </div>
+            <p class="study-note"><span aria-hidden="true">↻</span> Az alapkör után a hibás válaszok külön tanulókörben térnek vissza.</p>
+          </div>
+          </div>
+          <section class="learning-panel" id="learning-panel" aria-labelledby="learning-title" hidden>
+            <p class="card-kicker">GYORS ÁTTEKINTÉS</p>
+            <h2 id="learning-title">Vármegyék és székhelyeik</h2>
+            <p class="learning-intro">Tanulmányozd a neveket a térképen és a listában.</p>
+            <div class="county-list-wrap">
+              <table class="county-list">
+                <thead>
+                  <tr><th scope="col">Vármegye</th><th scope="col">Székhely</th></tr>
+                </thead>
+                <tbody id="county-list"></tbody>
+              </table>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="page-footer">
+        <span>19 vármegye</span>
+        <span>Apránként, biztos tudással.</span>
+      </footer>
+    </main>
+  </body>
+</html>

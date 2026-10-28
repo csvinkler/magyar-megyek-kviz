@@ -1,0 +1,9 @@
+{
+  "name": "magyar-megyek-kviz",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Egyszerű, egyjátékos vaktérképes kvíz Magyarország megyéivel.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
